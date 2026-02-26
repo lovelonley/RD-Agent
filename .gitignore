@@ -5,6 +5,9 @@ Pipfile
 public
 release-notes.md
 typescript*
+.env
+data/
+rdagent/scenarios/qlib/docker/qlib/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
