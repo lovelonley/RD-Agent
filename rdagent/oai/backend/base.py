@@ -566,7 +566,7 @@ class APIBackend(ABC):
         chat_cache_prefix: str = "",
         seed: Optional[int] = None,
         json_target_type: Optional[str] = None,
-        add_json_in_prompt: bool = False,
+        add_json_in_prompt: bool = True,
         response_format: Optional[Union[dict, Type[BaseModel]]] = None,
         **kwargs: Any,
     ) -> str:
