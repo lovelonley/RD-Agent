@@ -633,8 +633,14 @@ class APIBackend(ABC):
             parser = JSONParser(add_json_in_prompt=add_json_in_prompt)
             all_response = parser.parse(all_response)
             if json_target_type:
-                # deepseek will enter this branch
-                TypeAdapter(json_target_type).validate_json(all_response)
+                try:
+                    TypeAdapter(json_target_type).validate_json(all_response)
+                except Exception:
+                    parsed = json.loads(all_response)
+                    if isinstance(parsed, dict):
+                        parsed = {k: (v if isinstance(v, str) else json.dumps(v, ensure_ascii=False)) for k, v in parsed.items()}
+                        all_response = json.dumps(parsed, ensure_ascii=False)
+                    TypeAdapter(json_target_type).validate_json(all_response)
 
         if response_format is not None:
             if not isinstance(response_format, dict) and issubclass(response_format, BaseModel):

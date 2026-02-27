@@ -167,6 +167,9 @@ class QlibQuantHypothesisGen(FactorAndModelHypothesisGen):
 
     def convert_response(self, response: str) -> Hypothesis:
         response_dict = json.loads(response)
+        action = response_dict.get("action")
+        if action not in ("factor", "model"):
+            action = self.targets if self.targets in ("factor", "model") else "factor"
         hypothesis = QlibQuantHypothesis(
             hypothesis=response_dict.get("hypothesis"),
             reason=response_dict.get("reason"),
@@ -174,6 +177,6 @@ class QlibQuantHypothesisGen(FactorAndModelHypothesisGen):
             concise_observation=response_dict.get("concise_observation"),
             concise_justification=response_dict.get("concise_justification"),
             concise_knowledge=response_dict.get("concise_knowledge"),
-            action=response_dict.get("action"),
+            action=action,
         )
         return hypothesis

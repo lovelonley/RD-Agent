@@ -2,6 +2,7 @@ import copyreg
 from typing import Any, Literal, Optional, Type, TypedDict, Union, cast
 
 import numpy as np
+from rdagent.utils.workflow.loop import LOOP_PROGRESS
 from litellm import (
     completion,
     completion_cost,
@@ -200,10 +201,15 @@ class LiteLLMAPIBackend(APIBackend):
             cost = np.nan
         else:
             ACC_COST += cost
-            if LITELLM_SETTINGS.log_llm_chat_content:
-                logger.info(
-                    f"Current Cost: ${float(cost):.10f}; Accumulated Cost: ${float(ACC_COST):.10f}; {finish_reason=}",
-                )
+            lp = LOOP_PROGRESS
+            loop_str = f"Loop {lp['loop_idx']}"
+            if lp["loop_n"] is not None:
+                loop_str += f"/{lp['loop_n']}"
+            step_str = f"Step {lp['step_idx']}/{lp['steps_total']}({lp['step_name']})" if lp["steps_total"] else ""
+            progress_tag = f" | {loop_str} {step_str}" if step_str else ""
+            logger.info(
+                f"Cost: ${float(cost):.4f}; Total: ${float(ACC_COST):.4f}; {finish_reason=}{progress_tag}",
+            )
 
         prompt_tokens = token_counter(model=model, messages=messages)
         completion_tokens = token_counter(model=model, text=content)

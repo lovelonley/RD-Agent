@@ -23,6 +23,8 @@ import psutil
 from tqdm.auto import tqdm
 
 from rdagent.core.conf import RD_AGENT_SETTINGS
+
+LOOP_PROGRESS: dict[str, Any] = {"loop_idx": 0, "loop_n": None, "step_idx": 0, "step_name": "", "steps_total": 0}
 from rdagent.log import rdagent_logger as logger
 from rdagent.log.conf import LOG_SETTINGS
 from rdagent.log.timer import RD_Agent_TIMER_wrapper, RDAgentTimer
@@ -211,6 +213,11 @@ class LoopBase:
         async with self.get_semaphore(name):
 
             logger.info(f"Start Loop {li}, Step {si}: {name}")
+            LOOP_PROGRESS["loop_idx"] = li
+            LOOP_PROGRESS["loop_n"] = getattr(self, "_original_loop_n", self.loop_n)
+            LOOP_PROGRESS["step_idx"] = si
+            LOOP_PROGRESS["step_name"] = name
+            LOOP_PROGRESS["steps_total"] = len(self.steps)
             self.tracker.log_workflow_state()
 
             with logger.tag(f"Loop_{li}.{name}"):
@@ -357,6 +364,7 @@ class LoopBase:
             self.step_n = step_n
         if loop_n is not None:
             self.loop_n = loop_n
+        self._original_loop_n = loop_n
 
         # empty the queue when restarting
         while not self.queue.empty():
