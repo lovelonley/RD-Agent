@@ -198,11 +198,28 @@ class FactorOutputFormatEvaluator(FactorEvaluator):
                     json_target_type=Dict[str, str | bool | int],
                 )
                 resp_dict = json.loads(resp)
-                resp_dict["output_format_decision"] = str(resp_dict["output_format_decision"]).lower() in ["true", "1"]
+                decision_val = resp_dict.get("output_format_decision")
+                feedback_val = resp_dict.get("output_format_feedback")
+                if decision_val is None or feedback_val is None:
+                    for k, v in resp_dict.items():
+                        kl = k.lower()
+                        if decision_val is None and "decision" in kl:
+                            decision_val = v
+                        if feedback_val is None and ("feedback" in kl or "suggestion" in kl or "critic" in kl):
+                            feedback_val = v
+                if decision_val is None:
+                    decision_val = any(
+                        str(v).lower() in ("true", "yes", "correct", "pass", "aligned")
+                        for v in resp_dict.values()
+                        if isinstance(v, (str, bool))
+                    )
+                if feedback_val is None:
+                    feedback_val = json.dumps(resp_dict, ensure_ascii=False)
+                decision_bool = str(decision_val).lower() in ["true", "1", "yes", "correct", "pass", "aligned"]
 
                 return (
-                    str(resp_dict["output_format_feedback"]),
-                    resp_dict["output_format_decision"],
+                    str(feedback_val),
+                    decision_bool,
                 )
             except (KeyError, json.JSONDecodeError) as e:
                 attempts += 1
