@@ -549,19 +549,27 @@ class FactorFinalDecisionEvaluator(FactorEvaluator):
                         json_target_type=Dict[str, str | bool | int],
                     ),
                 )
-                final_decision = final_evaluation_dict["final_decision"]
-                final_feedback = final_evaluation_dict["final_feedback"]
+                final_decision = final_evaluation_dict.get("final_decision")
+                final_feedback = final_evaluation_dict.get("final_feedback")
+                if final_decision is None or final_feedback is None:
+                    for k, v in final_evaluation_dict.items():
+                        kl = k.lower()
+                        if final_decision is None and "decision" in kl:
+                            final_decision = v
+                        if final_feedback is None and ("feedback" in kl or "conclusion" in kl or "summary" in kl):
+                            final_feedback = v
+                if final_decision is None:
+                    final_decision = False
+                if final_feedback is None:
+                    final_feedback = json.dumps(final_evaluation_dict, ensure_ascii=False)
 
-                final_decision = str(final_decision).lower() in ["true", "1"]
-                return final_decision, final_feedback
+                final_decision = str(final_decision).lower() in ["true", "1", "yes", "correct", "pass"]
+                return final_decision, str(final_feedback)
 
-            except json.JSONDecodeError as e:
-                raise ValueError("Failed to decode JSON response from API.") from e
-            except KeyError as e:
+            except (json.JSONDecodeError, KeyError) as e:
                 attempts += 1
                 if attempts >= max_attempts:
-                    raise KeyError(
-                        "Response from API is missing 'final_decision' or 'final_feedback' key after multiple attempts."
-                    ) from e
+                    logger.warning(f"Final decision evaluation failed after {max_attempts} attempts: {e}. Returning conservative default.")
+                    return False, "Final decision evaluation failed after multiple attempts."
 
-        return None, None
+        return False, "Final decision evaluation failed."
