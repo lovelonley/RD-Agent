@@ -30,6 +30,7 @@ class QuantRDLoop(RDLoop):
         FactorEmptyError,
         ModelEmptyError,
         CoderError,
+        RuntimeError,
     )
 
     def __init__(self, PROP_SETTING: BasePropSetting):
