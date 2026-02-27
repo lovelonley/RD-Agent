@@ -110,7 +110,11 @@ class QuantRDLoop(RDLoop):
                 decision=False,
             )
             logger.log_object(feedback, tag="feedback")
-            self.trace.hist.append((prev_out["direct_exp_gen"]["exp_gen"], feedback))
+            exp_gen_result = prev_out.get("direct_exp_gen")
+            if exp_gen_result is not None and isinstance(exp_gen_result, dict):
+                self.trace.hist.append((exp_gen_result.get("exp_gen"), feedback))
+            else:
+                logger.warning(f"Skipping trace append for loop due to missing exp_gen result")
         else:
             if prev_out["direct_exp_gen"]["propose"].action == "factor":
                 feedback = self.factor_summarizer.generate_feedback(prev_out["running"], self.trace)
