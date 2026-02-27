@@ -12,7 +12,7 @@ from rdagent.components.workflow.conf import BasePropSetting
 from rdagent.components.workflow.rd_loop import RDLoop
 from rdagent.core.conf import RD_AGENT_SETTINGS
 from rdagent.core.developer import Developer
-from rdagent.core.exception import FactorEmptyError, ModelEmptyError
+from rdagent.core.exception import CoderError, FactorEmptyError, ModelEmptyError
 from rdagent.core.proposal import (
     Experiment2Feedback,
     Hypothesis2Experiment,
@@ -29,6 +29,7 @@ class QuantRDLoop(RDLoop):
     skip_loop_error = (
         FactorEmptyError,
         ModelEmptyError,
+        CoderError,
     )
 
     def __init__(self, PROP_SETTING: BasePropSetting):

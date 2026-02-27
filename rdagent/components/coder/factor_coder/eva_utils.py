@@ -10,6 +10,7 @@ from rdagent.components.coder.factor_coder.factor import FactorTask
 from rdagent.core.experiment import Task, Workspace
 from rdagent.oai.llm_conf import LLM_SETTINGS
 from rdagent.oai.llm_utils import APIBackend
+from rdagent.log import rdagent_logger as logger
 from rdagent.utils.agent.tpl import T
 
 
@@ -224,11 +225,10 @@ class FactorOutputFormatEvaluator(FactorEvaluator):
             except (KeyError, json.JSONDecodeError) as e:
                 attempts += 1
                 if attempts >= max_attempts:
-                    raise KeyError(
-                        "Wrong JSON Response or missing 'output_format_decision' or 'output_format_feedback' key after multiple attempts."
-                    ) from e
-
-        return "Failed to evaluate output format after multiple attempts.", False
+                    logger.warning(
+                        f"Output format evaluation failed after {max_attempts} attempts: {e}. Returning conservative default."
+                    )
+                    return ("Output format evaluation failed after multiple attempts.", False)
 
 
 class FactorDatetimeDailyEvaluator(FactorEvaluator):
