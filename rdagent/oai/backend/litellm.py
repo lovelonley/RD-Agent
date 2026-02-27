@@ -83,6 +83,7 @@ class LiteLLMAPIBackend(APIBackend):
         response = embedding(
             model=model_name,
             input=input_content_list,
+            timeout=60,
         )
         response_list = [data["embedding"] for data in response.data]
         return response_list
@@ -157,6 +158,7 @@ class LiteLLMAPIBackend(APIBackend):
             messages=messages,
             stream=LITELLM_SETTINGS.chat_stream,
             max_retries=0,
+            timeout=120,
             **complete_kwargs,
             **kwargs,
         )
