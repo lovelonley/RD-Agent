@@ -41,7 +41,9 @@ class QlibFactorHypothesisGen(FactorHypothesisGen):
                 else "Now, you need to try factors that can achieve high IC (e.g., machine learning-based factors)."
             ),
             "hypothesis_output_format": T("scenarios.qlib.prompts:factor_hypothesis_output_format").r(),
-            "hypothesis_specification": T("scenarios.qlib.prompts:factor_hypothesis_specification").r(),
+            "hypothesis_specification": T("scenarios.qlib.prompts:factor_hypothesis_specification").r(
+                base_factor_description="Alpha158 is a high-quality hand-crafted factor library in Qlib, including 158 factors covering Momentum, Volatility, Quality, etc. You can find their names (e.g., KLEN, WVMA5, RSQR5, CORR10, etc.) in the data description. Please combine them to create stronger signals."
+            ),
         }
         return context_dict, True
 

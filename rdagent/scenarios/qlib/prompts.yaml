@@ -107,7 +107,11 @@ factor_hypothesis_specification: |-
   4. **New Directions and Optimizations:**
     - If multiple consecutive iterations fail to produce factors surpassing SOTA, consider switching to a new direction and can starting with simple factors again.
     - If optimizing a specific type of factor, proceed from simple to complex.
-  5. Note
+  5. **Base Factors (Alpha158):**
+    - You are provided with a set of base factors (Alpha158). Instead of re-implementing basic price/volume factors, you are encouraged to use these base factors as building blocks.
+    - Base factors description: {{ base_factor_description }}
+    - Focus on creating higher-order non-linear combinations or complex logic based on these existing features to improve prediction power.
+  6. Note
     - Highlight that factors surpassing SOTA are included in the library to avoid re-implementation.
     - No matter how many factors you plan to generate, only reply with one set of hypothesis and reason. The hypothesis can include the proposal of multiple factors at the same time.
 
